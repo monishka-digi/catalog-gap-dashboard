@@ -1,4 +1,4 @@
-const DEMO_API_URL = import.meta.env.VITE_DEMO_API_URL || "https://demo-api.example.com/gap-analysis";
+const DEMO_API_URL =  "http://192.168.0.115:8005/public/api/v1/ingest/process";
 
 async function callDemoApi(payload, { timeout = 8000, signal } = {}) {
   const controller = new AbortController();
