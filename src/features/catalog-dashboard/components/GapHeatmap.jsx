@@ -9,7 +9,7 @@ function GapHeatmap({ gaps, maxFreq, onGenerate }) {
 
   return (
     <section className="tab-content active">
-      <SectionTitle count={gaps.length}>Gap heatmap</SectionTitle>
+      <SectionTitle count={gaps.length}>Attribute Gap Intelligence</SectionTitle>
       {gaps.length === 0 ? (
         <div className="no-data">No gaps match your filters.</div>
       ) : (

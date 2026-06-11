@@ -14,7 +14,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
 function ChartsGrid({ chartData }) {
   return (
     <div className="charts-grid">
-      <ChartBox title="Gap frequency by attribute" badge="Top 8" badgeStyle={{ background: "#e0e7ff", color: "#3730a3" }}>
+      <ChartBox title="Attribute Gap Insights" badge="Top 8" badgeStyle={{ background: "#e0e7ff", color: "#3730a3" }}>
         <Bar data={chartData.frequency} options={frequencyOptions} />
       </ChartBox>
       <ChartBox title="Priority distribution" badge="By SKU count" badgeStyle={{ background: "#fee2e2", color: "#991b1b" }}>

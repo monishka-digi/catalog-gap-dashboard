@@ -6,7 +6,7 @@ import { suggestionKey } from "../utils/catalogDashboardUtils";
 function SuggestionPanels({ suggestions, onApprove, onReject, onEdit }) {
   return (
     <section className="tab-content active suggestion-tab">
-      <SectionTitle count={suggestions.length}>Description suggestions</SectionTitle>
+      <SectionTitle count={suggestions.length}>Attribute Review & Approval</SectionTitle>
       {suggestions.length === 0 ? (
         <div className="no-data">No suggestions match your filters.</div>
       ) : (
@@ -51,7 +51,7 @@ function SuggestionCard({ suggestion, onApprove, onReject, onEdit }) {
         <DescriptionBox title="x Current description" tone="old">
           {suggestion.oldDesc || suggestion.old_description || suggestion.currentDescription || suggestion.current_description || "No current description available."}
         </DescriptionBox>
-        <DescriptionBox title="✓ Suggested description" tone="new">
+        <DescriptionBox title="✓ Smart Attribute Suggestions" tone="new">
           <span
             dangerouslySetInnerHTML={{
               __html:

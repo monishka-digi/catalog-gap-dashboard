@@ -2,7 +2,7 @@ import { fallbackDashboardPayload } from "../data/catalogDashboardData.js";
 
 const DASHBOARD_ENDPOINT = "/api/v1/gap-analysis/dashboard";
 
-export async function fetchDashboardData({ signal } = {}) {
+export async function fetchDashboardData({ signal, fallbackPayload = fallbackDashboardPayload } = {}) {
   try {
     const response = await fetch(createDashboardUrl(), {
       headers: {
@@ -13,7 +13,7 @@ export async function fetchDashboardData({ signal } = {}) {
 
     if (!response.ok) {
       console.warn(`Dashboard request failed with ${response.status}, falling back to static data.`);
-      return normalizeDashboardPayload(fallbackDashboardPayload);
+      return normalizeDashboardPayload(fallbackPayload);
     }
 
     const payload = await response.json();
@@ -24,7 +24,7 @@ export async function fetchDashboardData({ signal } = {}) {
     }
 
     console.warn("Dashboard fetch failed, falling back to static data.", error);
-    return normalizeDashboardPayload(fallbackDashboardPayload);
+    return normalizeDashboardPayload(fallbackPayload);
   }
 }
 

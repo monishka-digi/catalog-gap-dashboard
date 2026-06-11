@@ -11,9 +11,9 @@ import {
   chartColors,
   priorities,
   statuses,
-  fallbackDashboardPayload,
+  fallbackGapDashboardPayload,
+  fallbackSuggestionDashboardPayload,
 } from "../features/catalog-dashboard/data/catalogDashboardData";
-import { getGapHeatmapData, getDistributionSuggestionData } from "../services/dashboardApi";
 import { normalizeDashboardPayload } from "../features/catalog-dashboard/api/dashboardApi";
 import "../features/catalog-dashboard/styles/catalogDashboard.css";
 import { suggestionKey } from "../features/catalog-dashboard/utils/catalogDashboardUtils";
@@ -34,97 +34,6 @@ function Dashboard() {
   const [loadError, setLoadError] = useState("");
   const [toast, setToast] = useState("");
 
-  // Demo payloads (can be replaced by real payloads later)
-  const DEMO_PAYLOAD_HEATMAP = {
-    correlation_id: "",
-    raw_text_query: "catalog gap analysis",
-    user_info: {
-      identity: { user_id: "acme_admin", email: "admin@acme.com", name: "Acme Admin", tenant_id: "ACME" },
-      auth: { api_key: "ACME-ENTERPRISE-KEY"},
-      license: { tenant_id: "ACME", plan: "NORMAL", subscription_level: "TRIAL", rate_limit: 10000 },
-      rbac: { roles: ["CUSTOMER_ADMIN"], permissions: ["ALL"] },
-      abac: {},
-    },
-    action: { actionPerformed: "Need Data", payload: {"description": "Generate dashboard data"} },
-    files: [],
-    execution_params: { sku_ids: [], sku_id: "", sku: "", query: "", run_id: "string", additionalProp1: {} },
-    channel_type: "WEB",
-    source_system: "ADMIN_CONSOLE",
-    locale: "en-IN",
-    status: "SUCCESS",
-  };
-
-  const DEMO_PAYLOAD_DISTRIBUTION = {
-    correlation_id: "",
-    raw_text_query: "description generation",
-    user_info: {
-      identity: { user_id: "acme_admin", email: "admin@acme.com", name: "Acme Admin", tenant_id: "ACME" },
-      auth: { api_key: "ACME-ENTERPRISE-KEY", use_idp: false, idp_type: "", idp_server: {}, id_token: "", access_token: "", internal_token: "" },
-      license: { tenant_id: "ACME", plan: "NORMAL", subscription_level: "TRIAL", rate_limit: 10000 },
-      rbac: { roles: ["CUSTOMER_ADMIN"], permissions: ["ALL"] },
-      abac: { },
-    },
-    action: { actionPerformed: "Need Data", payload: {"description": "Generate description suggestions"} },
-    files: [],
-    execution_params: { sku_ids: [], sku_id: "", sku: "", query: "", run_id: "string", additionalProp1: {} },
-    channel_type: "WEB",
-    source_system: "ADMIN_CONSOLE",
-    locale: "en-IN",
-    status: "SUCCESS",
-  };
-
-  const FALLBACK_DESCRIPTION_SUGGESTIONS = [
-    {
-      id: 2,
-      gap_id: 23,
-      sku: "SKU_304",
-      product_catalog_id: 693,
-      product_name: "GamingBeast 17 Laptop",
-      category: "Laptops",
-      brand: "ROG",
-      missing_attribute: "weight_grams",
-      attribute_category: "Other",
-      priority: "MEDIUM",
-      query_frequency: 1,
-      suggested_attribute_value: "2950",
-      old_description: "A high-end 17-inch gaming laptop packed with desktop-class performance graphics.",
-      revised_description: "A high-end 17-inch gaming laptop, weighing 2950 grams, packed with desktop-class performance graphics.",
-      generation_confidence: "0.9446",
-      llm_model: "gemini-2.5-flash",
-      prompt_version: "v1",
-      model_version: "v1.0",
-      review_status: "PENDING_REVIEW",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      generated_at: "2026-06-09T14:19:55",
-    },
-    {
-      id: 1,
-      gap_id: 22,
-      sku: "SKU_005",
-      product_catalog_id: 694,
-      product_name: "TravelPad Compact Keyboard",
-      category: "Accessories",
-      brand: "Logitech",
-      missing_attribute: "battery_life",
-      attribute_category: "Power",
-      priority: "HIGH",
-      query_frequency: 1,
-      suggested_attribute_value: "Up to 24 months",
-      old_description: "A portable, ultra-slim wireless keyboard built for multi-device travel setups.",
-      revised_description: "A portable, ultra-slim wireless keyboard offering up to 24 months of battery life, built for seamless multi-device travel setups.",
-      generation_confidence: "0.9840",
-      llm_model: "gemini-2.5-flash",
-      prompt_version: "v1",
-      model_version: "v1.0",
-      review_status: "PENDING_REVIEW",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      generated_at: "2026-06-08T16:55:14",
-    },
-  ];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -134,32 +43,18 @@ function Dashboard() {
         setIsLoading(true);
         setLoadError("");
 
-        // Priority 1: Demo API
         try {
-          const demoResp = await getGapHeatmapData(DEMO_PAYLOAD_HEATMAP, { signal: controller.signal });
-          if (demoResp && demoResp.success) {
-            setDashboardData(normalizeDashboardPayload(demoResp));
-            return;
-          }
-        } catch (e) {
-          if (e?.name === "AbortError") throw e;
-          console.warn("Demo heatmap API failed, falling back to existing API", e);
-        }
-
-        // Priority 2: Existing API
-        try {
-          const existing = await fetchDashboardData({ signal: controller.signal });
+          const existing = await fetchDashboardData({ signal: controller.signal, fallbackPayload: fallbackGapDashboardPayload });
           if (existing) {
             setDashboardData(existing);
             return;
           }
         } catch (e) {
           if (e?.name === "AbortError") throw e;
-          console.warn("Existing API failed, falling back to static data", e);
+          console.warn("Dashboard API failed, falling back to static gap data", e);
         }
 
-        // Priority 3: Static fallback
-        setDashboardData(normalizeDashboardPayload(fallbackDashboardPayload));
+        setDashboardData(normalizeDashboardPayload(fallbackGapDashboardPayload));
       } catch (error) {
         if (error?.name !== "AbortError") {
           setLoadError(error?.message || "Unable to load dashboard data.");
@@ -176,7 +71,7 @@ function Dashboard() {
     return () => controller.abort();
   }, []);
 
-  // Tab change handler that triggers demo API for Distribution Suggestion
+  // Tab change handler that loads suggestion distribution data when switching to the Suggestions tab
   const handleTabChange = async (tab) => {
     setActiveTab(tab);
     if (tab !== "suggestions") return;
@@ -186,40 +81,18 @@ function Dashboard() {
       setIsLoading(true);
       setLoadError("");
 
-      // Priority 1: Demo API for distribution suggestion
       try {
-        const demoResp = await getDistributionSuggestionData(DEMO_PAYLOAD_DISTRIBUTION, { signal: controller.signal });
-        if (demoResp && demoResp.success) {
-          const normalizedDemo = normalizeDashboardPayload(demoResp);
-          if (normalizedDemo.suggestions.length > 0 && hasSuggestionDescriptions(normalizedDemo.suggestions)) {
-            setDashboardData(normalizedDemo);
-            return;
-          }
-        }
-      } catch (e) {
-        if (e?.name === "AbortError") throw e;
-        console.warn("Demo distribution API failed, trying existing API", e);
-      }
-
-      // Priority 2: Existing API
-      try {
-        const existing = await fetchDashboardData({ signal: controller.signal });
-        if (existing && existing.suggestions.length > 0 && hasSuggestionDescriptions(existing.suggestions)) {
+        const existing = await fetchDashboardData({ signal: controller.signal, fallbackPayload: fallbackSuggestionDashboardPayload });
+        if (existing && existing.suggestions.length > 0) {
           setDashboardData(existing);
           return;
         }
       } catch (e) {
         if (e?.name === "AbortError") throw e;
-        console.warn("Existing API failed, falling back to static data", e);
+        console.warn("Dashboard API failed for suggestion distribution, falling back to static suggestion data", e);
       }
 
-      // Priority 3: Static fallback for description suggestions
-      const fallbackDashboard = normalizeDashboardPayload(fallbackDashboardPayload);
-      const fallbackSuggestions = normalizeDashboardPayload({ success: true, result: { suggestions: FALLBACK_DESCRIPTION_SUGGESTIONS } });
-      setDashboardData({
-        ...fallbackDashboard,
-        suggestions: fallbackSuggestions.suggestions,
-      });
+      setDashboardData(normalizeDashboardPayload(fallbackSuggestionDashboardPayload));
     } catch (error) {
       if (error?.name !== "AbortError") setLoadError(error?.message || "Unable to load distribution data.");
     } finally {

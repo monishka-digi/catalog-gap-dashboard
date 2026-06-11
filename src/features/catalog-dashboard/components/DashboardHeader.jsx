@@ -3,7 +3,8 @@ function DashboardHeader({ metrics }) {
     <header className="header">
       <div className="header-top">
         <h1>
-          Catalog Gap Analysis <span>&amp; Description Intelligence</span>
+          Sentiment Analysis
+          <span> &amp; Intelligence Dashboard</span>
         </h1>
         <span className="live-badge">
           <span className="live-dot" />
