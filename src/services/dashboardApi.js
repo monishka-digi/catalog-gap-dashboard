@@ -1,4 +1,4 @@
-const DEMO_API_URL =  "http://192.168.0.115:8005/public/api/v1/ingest/process";
+const DEMO_API_URL =  "http://192.168.0.115:8005/public/api/v1/ingest/process" ;
 
 async function callDemoApi(payload, { timeout = 8000, signal } = {}) {
   const controller = new AbortController();
@@ -6,6 +6,7 @@ async function callDemoApi(payload, { timeout = 8000, signal } = {}) {
   const timer = setTimeout(() => controller.abort(), timeout);
 
   try {
+    console.log(`Calling demo API at ${DEMO_API_URL} with payload:`, payload);
     const res = await fetch(DEMO_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },

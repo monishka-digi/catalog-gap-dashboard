@@ -1,6 +1,6 @@
 import { fallbackDashboardPayload } from "../data/catalogDashboardData.js";
 
-const DASHBOARD_ENDPOINT = "/api/v1/gap-analysis/dashboard";
+// const DASHBOARD_ENDPOINT = "/api/v1/gap-analysis/dashboard";
 
 export async function fetchDashboardData({ signal, fallbackPayload = fallbackDashboardPayload } = {}) {
   try {
@@ -29,8 +29,8 @@ export async function fetchDashboardData({ signal, fallbackPayload = fallbackDas
 }
 
 function createDashboardUrl() {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
-
+  const baseUrl = "http://192.168.0.115:8005/public/api/v1/ingest/process";
+  console.log(`Using dashboard API URL: ${baseUrl}`);
   if (!baseUrl) {
     return DASHBOARD_ENDPOINT;
   }
