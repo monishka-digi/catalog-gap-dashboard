@@ -34,7 +34,7 @@ export async function fetchDashboardData({ signal, fallbackPayload = fallbackDas
 }
 
 function createDashboardUrl() {
-  const baseUrl = "http://192.168.0.115:8005/public/api/v1/ingest/process";
+  const baseUrl = "http://localhost:8005/public/api/v1/ingest/process";
   console.log(`Dashboard API URL: ${baseUrl}`);
   return baseUrl;
 }
