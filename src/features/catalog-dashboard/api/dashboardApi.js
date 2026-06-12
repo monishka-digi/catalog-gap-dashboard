@@ -4,38 +4,39 @@ import { fallbackDashboardPayload } from "../data/catalogDashboardData.js";
 
 export async function fetchDashboardData({ signal, fallbackPayload = fallbackDashboardPayload } = {}) {
   try {
+    console.log("Attempting to fetch dashboard data from API...");
     const response = await fetch(createDashboardUrl(), {
+      method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Accept: "application/json",
       },
+      body: JSON.stringify(fallbackPayload),
       signal,
     });
 
     if (!response.ok) {
-      console.warn(`Dashboard request failed with ${response.status}, falling back to static data.`);
+      console.warn(`Dashboard API request failed with ${response.status}, falling back to static data.`);
       return normalizeDashboardPayload(fallbackPayload);
     }
 
-    const payload = await response.json();
-    return normalizeDashboardPayload(payload);
+    const apiPayload = await response.json();
+    console.log("Dashboard data fetched from API successfully.");
+    return normalizeDashboardPayload(apiPayload);
   } catch (error) {
     if (error?.name === "AbortError") {
       throw error;
     }
 
-    console.warn("Dashboard fetch failed, falling back to static data.", error);
+    console.warn("Dashboard API fetch failed, falling back to static data.", error);
     return normalizeDashboardPayload(fallbackPayload);
   }
 }
 
 function createDashboardUrl() {
-  const baseUrl = "http://192.168.0.115:8005/public/api/v1/ingest/process";
-  console.log(`Using dashboard API URL: ${baseUrl}`);
-  if (!baseUrl) {
-    return DASHBOARD_ENDPOINT;
-  }
-
-  return `${baseUrl.replace(/\/$/, "")}${DASHBOARD_ENDPOINT}`;
+  const baseUrl = "http://localhost:8005/public/api/v1/ingest/process";
+  console.log(`Dashboard API URL: ${baseUrl}`);
+  return baseUrl;
 }
 
 export function normalizeDashboardPayload(payload) {
